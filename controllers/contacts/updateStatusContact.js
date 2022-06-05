@@ -1,13 +1,8 @@
-const { Contact, favoriteJoiSchema } = require("../../models/contact");
+const { Contact } = require("../../models/contact");
+const { NotFound } = require("http-errors");
 
 const updateStatusContact = async (req, res, next) => {
   try {
-    const { error } = favoriteJoiSchema.validate(req.body);
-    if (error) {
-      error.status = 400;
-      error.message = "missing field favorite";
-      throw error;
-    }
     const { contactId } = req.params;
     const { favorite } = req.body;
     const contact = await Contact.findByIdAndUpdate(
@@ -18,9 +13,7 @@ const updateStatusContact = async (req, res, next) => {
       }
     );
     if (!contact) {
-      const error = new Error("Not found");
-      error.status = 404;
-      throw error;
+      throw new NotFound("Not found");
     }
     res.json({
       status: "success",
