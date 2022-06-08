@@ -1,20 +1,14 @@
-const { Contact, joiSchema } = require("../../models/contact");
+const { Contact } = require("../../models/contact");
+const { NotFound } = require("http-errors");
 
 const updateContact = async (req, res, next) => {
   try {
-    const { error } = joiSchema.validate(req.body);
-    if (error) {
-      error.status = 400;
-      throw error;
-    }
     const { contactId } = req.params;
     const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
       new: true,
     });
     if (!contact) {
-      const error = new Error("Not found");
-      error.status = 404;
-      throw error;
+      throw new NotFound("Not found");
     }
     res.json({
       status: "success",
